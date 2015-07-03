@@ -14,7 +14,7 @@ end
 def add_subtask
 end
 
-def set_https_connection
+def configure_https_connection
   # set up HTTPS connection
   uri = URI.parse("https://app.asana.com/api/1.0/tasks")
   http = Net::HTTP.new(uri.host, uri.port)
@@ -57,7 +57,18 @@ def issue_request(uri, header, http, data)
   return res
 end
 
-uri, http, header = set_https_connection
+def print_response(response_body)
+  body = JSON.parse(response_body)
+  if body['errors'] then
+    puts "Server returned an error: #{body['errors'][0]['message']}"
+  else
+    puts "Created task with id: #{body['data']['id']}"
+  end
+end
+
+#--------------------
+
+uri, http, header = configure_https_connection
 columns = task_sheet.shift
 
 while task_sheet.length > 0
@@ -65,12 +76,7 @@ while task_sheet.length > 0
 
   response = issue_request(uri, header, http, data)
 
+  print_response(response.body)
 
   # output
-  body = JSON.parse(response.body)
-  if body['errors'] then
-    puts "Server returned an error: #{body['errors'][0]['message']}"
-  else
-    puts "Created task with id: #{body['data']['id']}"
-  end
 end
