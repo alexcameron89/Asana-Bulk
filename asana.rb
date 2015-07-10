@@ -4,7 +4,10 @@ require "rubygems"
 require "json"
 require "net/https"
 require "csv"
-API_KEY = "2eSUdgF2.wSgSYfK9hqcVz70LFiWPgg5"
+require "yaml"
+
+config = YAML.load_file('config.yml')
+API_KEY = config["api"]
 sheet_loc = ARGV.shift
 task_sheet = CSV.read(sheet_loc)
 
