@@ -29,17 +29,18 @@ def configure_https_connection
   return uri, http, header
 end
 
-def structure_row_content(row, uri)
+def structure_data(column_data, row, uri)
   data = Hash.new
-  if row[0] == "subtask"
-    uri.path = "/api/1.0/tasks/#{row[1]}/subtasks"
+  row.each_with_index { |item, index | data[column_data[index]] = item }
+
+  type = data.delete("type")
+
+  if type == "subtask"
+    parent = data.delete("parent")
+    uri.path = "/api/1.0/tasks/#{parent}/subtasks"
   else
     uri.path = "/api/1.0/tasks"
-    data["projects"] = row[1]
-    data["workspace"] = "7888734474284"
   end
-  data["name"] = row[2]
-  data["notes"] = row[3]
 
   return data
 end
@@ -72,7 +73,7 @@ uri, http, header = configure_https_connection
 columns = task_sheet.shift
 
 while task_sheet.length > 0
-  data = structure_row_content(task_sheet.pop, uri)
+  data = structure_data(columns, task_sheet.pop, uri)
 
   response = issue_request(uri, header, http, data)
 
