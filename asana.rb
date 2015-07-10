@@ -31,7 +31,11 @@ end
 
 def structure_data(column_data, row, uri)
   data = Hash.new
-  row.each_with_index { |item, index | data[column_data[index]] = item }
+  row.each_with_index do |item, index |
+    data[column_data[index]] = item unless item == nil
+    p item
+    p item.class
+  end
 
   type = data.delete("type")
 
