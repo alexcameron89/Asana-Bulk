@@ -6,15 +6,9 @@ require "net/https"
 require "csv"
 require "yaml"
 
-config = YAML.load_file('config.yml')
-API_KEY = config["api"]
-sheet_loc = ARGV.shift
-task_sheet = CSV.read(sheet_loc)
-
-def add_task
-end
-
-def add_subtask
+def leave(statement)
+  puts statement
+  exit 1
 end
 
 def configure_https_connection
@@ -75,6 +69,18 @@ def print_response(response_body)
 end
 
 #--------------------
+
+leave("File argument missing.\nUsage: \"asanacl filename\"") if ARGV.length == 0
+
+ASANA_API = ENV['ASANA_API']
+leave("ASANA_API is not set. Set your Asana API key with \"export ASANA_API=keyvalue\"") if ASANA_API.nil?
+
+csv_location = ARGV.shift
+begin
+  task_sheet = CSV.read(csv_location)
+rescue
+  leave("File could not be opened. See if it exists and permissions are set.")
+end
 
 uri, http, header = configure_https_connection
 columns = task_sheet.shift
